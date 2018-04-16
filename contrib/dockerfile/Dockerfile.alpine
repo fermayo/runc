@@ -1,0 +1,10 @@
+FROM golang:1.13-alpine3.10 AS build-runc
+RUN apk --no-cache add bash git curl build-base libseccomp-dev
+WORKDIR /go/src/github.com/opencontainers/runc
+COPY . /go/src/github.com/opencontainers/runc
+RUN make runc
+
+FROM alpine:3.7
+RUN apk --no-cache add libseccomp
+COPY --from=build-runc /go/src/github.com/opencontainers/runc/runc /usr/local/bin/runc
+CMD ["runc"]
